@@ -15,32 +15,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
+  build:
+    name: Test and build portfolio
     runs-on: ubuntu-latest
-    outputs:
-      has_source: ${{ steps.detect.outputs.has_source }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Detect Vite source
-        id: detect
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Restore V6 source on initial upload
         shell: bash
         run: |
-          if [[ -f package.json && -f index.html && -f vite.config.ts && -d src ]]; then
-            echo "has_source=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_source=false" >> "$GITHUB_OUTPUT"
-            echo "Portfolio source is not present yet; build and deploy are skipped."
+          if [[ ! -f package.json ]]; then
+            test -f .upload/source.tar.gz.b64 || {
+              echo "::error::Portfolio source is missing."
+              exit 1
+            }
+            base64 --decode .upload/source.tar.gz.b64 > /tmp/ruzickajakub-source.tar.gz
+            tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
           fi
 
-  build:
-    needs: prepare
-    if: needs.prepare.outputs.has_source == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -50,7 +45,7 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build site
+      - name: Build static site
         run: npm run build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -59,18 +54,52 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
   deploy:
+    name: Deploy to GitHub Pages
     needs: build
-    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4
+
+  sync-source:
+    name: Commit unpacked source files
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Unpack and commit source tree on first deployment
+        shell: bash
+        run: |
+          if [[ -f package.json || ! -f .upload/source.tar.gz.b64 ]]; then
+            echo "Source tree is already present; no sync needed."
+            exit 0
+          fi
+
+          base64 --decode .upload/source.tar.gz.b64 > /tmp/ruzickajakub-source.tar.gz
+          tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
+          rm -rf .upload
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: add RUZICKAJAKUB V6 source tree"
+          git push origin HEAD:main
