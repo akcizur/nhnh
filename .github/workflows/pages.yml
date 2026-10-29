@@ -54,11 +54,6 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -78,7 +73,7 @@ jobs:
 
   sync-source:
     name: Commit unpacked source files
-    needs: deploy
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
