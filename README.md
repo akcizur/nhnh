@@ -1,23 +1,23 @@
 # RUZICKAJAKUB — Evolved V6
 
-Personal portfolio of Jakub Růžička, built with React, TypeScript and Vite.
+React, TypeScript and Vite portfolio with the giant-to-navbar title morph, viewport-reactive 3D typography, and the refined horizontal project gallery.
 
-## Automatic GitHub Pages deployment
+## GitHub Pages automation
 
-Every push to `main` runs the GitHub Actions workflow: restore the project source archive, install dependencies, run tests, build the site, and deploy the `dist/` output to GitHub Pages. A manual run is also available under **Actions → Build and deploy GitHub Pages → Run workflow**.
+The repository includes a GitHub Actions workflow at `.github/workflows/pages.yml`. Once the source bundle is present, every push to `main` automatically installs dependencies, runs tests, builds the site and deploys `dist/` to GitHub Pages. The workflow can also be started manually from **Actions**.
 
-The source bundle is `.source-parts/` (a compressed tar archive split into text-safe parts to transfer it reliably). The workflow reconstructs and extracts it before running npm.
+**Source transfer still needs to be completed:** this repository currently has the deploy workflow, but the full project source bundle has not been added to the repository yet. The workflow expects base64-encoded archive chunks at `.source-parts/part*.b64`; until those files exist, it safely skips build/deploy instead of failing.
 
 ## Local development
 
-After extracting the project source archive:
+From the extracted project source:
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Production build
+## Verify before deploy
 
 ```bash
 npm test
@@ -25,4 +25,4 @@ npm run build
 npm run preview
 ```
 
-For a project site, Vite automatically uses `/nhnh/` as its base path in GitHub Actions.
+For GitHub Pages project hosting, Vite uses `/nhnh/` as its base path when the build runs in GitHub Actions.
