@@ -34,6 +34,10 @@ jobs:
             tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
           fi
 
+      - name: Align esbuild with Vite 8
+        run: |
+          node -e "const fs=require('node:fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.devDependencies={...p.devDependencies,esbuild:'^0.28.2'}; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -90,6 +94,7 @@ jobs:
 
           base64 --decode .upload/source.tar.gz.b64 > /tmp/ruzickajakub-source.tar.gz
           tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
+          node -e "const fs=require('node:fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.devDependencies={...p.devDependencies,esbuild:'^0.28.2'}; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
           rm -rf .upload
 
           git config user.name "github-actions[bot]"
