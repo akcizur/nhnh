@@ -15,7 +15,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      has_source: ${{ steps.detect.outputs.has_source }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Check for source bundle
+        id: detect
+        shell: bash
+        run: |
+          if compgen -G ".source-parts/part*.b64" > /dev/null; then
+            echo "has_source=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_source=false" >> "$GITHUB_OUTPUT"
+            echo "Source bundle is not present yet; build and deploy are skipped."
+          fi
+
   build:
+    needs: prepare
+    if: needs.prepare.outputs.has_source == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -53,11 +73,12 @@ jobs:
           path: dist
 
   deploy:
+    needs: build
+    if: needs.build.result == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
