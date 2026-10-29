@@ -1,23 +1,23 @@
 # RUZICKAJAKUB — Evolved V6
 
-React, TypeScript and Vite portfolio with the giant-to-navbar title morph, viewport-reactive 3D typography, and the refined horizontal project gallery.
+Portfolio built with React, TypeScript and Vite. The latest source bundle is available here: [RUZICKAJAKUB Evolved V6 ZIP](sandbox:/mnt/data/ruzickajakub-evolved-v6.zip).
 
-## GitHub Pages automation
+## Automatic GitHub Pages deployment
 
-The repository includes a GitHub Actions workflow at `.github/workflows/pages.yml`. Once the source bundle is present, every push to `main` automatically installs dependencies, runs tests, builds the site and deploys `dist/` to GitHub Pages. The workflow can also be started manually from **Actions**.
+The workflow at `.github/workflows/pages.yml` is configured to run on every push to `main` and via **Actions → Build and deploy GitHub Pages → Run workflow**. It detects the Vite source tree, installs dependencies, runs tests, builds `dist/` and deploys it with GitHub Pages. If the source tree is missing, it skips deployment rather than failing.
 
-**Source transfer still needs to be completed:** this repository currently has the deploy workflow, but the full project source bundle has not been added to the repository yet. The workflow expects base64-encoded archive chunks at `.source-parts/part*.b64`; until those files exist, it safely skips build/deploy instead of failing.
+## Current repository status
+
+The repository has been initialized with the deployment workflow, but the full V6 application source has **not yet been pushed into the repository**. To finish the upload, extract the contents of the ZIP into the repository root, preserving `src/`, `public/` (if present), `index.html`, `package.json`, `tsconfig.json`, and `vite.config.ts`; then commit and push to `main`. The workflow will build and deploy automatically.
 
 ## Local development
-
-From the extracted project source:
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Verify before deploy
+## Verify production
 
 ```bash
 npm test
@@ -25,4 +25,4 @@ npm run build
 npm run preview
 ```
 
-For GitHub Pages project hosting, Vite uses `/nhnh/` as its base path when the build runs in GitHub Actions.
+For the GitHub Pages project site, Vite uses `/nhnh/` as its base path in Actions.
