@@ -863,8 +863,6 @@ export default function App() {
     const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
     const quinticEaseOut = (t: number) => 1 - Math.pow(1 - t, 5);
 
-    const edgeTop = q('.edge--top');
-    const edgeBottom = q('.edge--bottom');
     const topGlow = q('.edge--top .edge__glow');
     const bottomGlow = q('.edge--bottom .edge__glow');
     const topHaze = q('.edge--top .edge__haze');
@@ -1279,16 +1277,9 @@ export default function App() {
       rootEl.style.setProperty('--edge-diffusion-opacity-top', (0.82 + edgeEnergyTop * 0.14).toFixed(3));
       rootEl.style.setProperty('--edge-diffusion-opacity-bottom', (0.82 + edgeEnergyBottom * 0.14).toFixed(3));
 
-      applyTransform(
-        edgeTop,
-        `translate3d(0,${((currentVel < 0 ? -1 : 1) * edgeEnergy * 10).toFixed(2)}px,0)`,
-        'topEdge'
-      );
-      applyTransform(
-        edgeBottom,
-        `translate3d(0,${((currentVel > 0 ? 1 : -1) * edgeEnergy * 10).toFixed(2)}px,0)`,
-        'bottomEdge'
-      );
+      // Do not transform the fixed edge wrappers: transform establishes a
+      // backdrop root and prevents their ::before/::after layers from sampling
+      // the page behind them. Animate only the inner haze/glow/mist elements.
       applyTransform(
         topGlow,
         `translate3d(${(currentVel * 0.12).toFixed(2)}px,${(-edgeEnergy * 24).toFixed(2)}px,0)`,
