@@ -22,32 +22,21 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Restore V6 source on initial upload
-        shell: bash
-        run: |
-          if [[ ! -f package.json ]]; then
-            test -f .upload/source.tar.gz.b64 || {
-              echo "::error::Portfolio source is missing."
-              exit 1
-            }
-            base64 --decode .upload/source.tar.gz.b64 > /tmp/ruzickajakub-source.tar.gz
-            tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
-          fi
-
-      - name: Align esbuild with Vite 8
-        run: |
-          node -e "const fs=require('node:fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.devDependencies={...p.devDependencies,esbuild:'^0.28.2'}; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
-
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
       - name: Run tests
         run: npm test
+
+      - name: TypeScript check
+        run: npm run lint
 
       - name: Build static site
         run: npm run build
@@ -59,9 +48,62 @@ jobs:
         with:
           path: dist
 
+  check-pages:
+    name: Check GitHub Pages configuration
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - name: Detect Pages configuration
+        id: pages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status="$(curl --silent --show-error --location \
+            --output "$RUNNER_TEMP/pages.json" \
+            --write-out '%{http_code}' \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/pages")"
+
+          if [[ "$status" == "200" ]]; then
+            build_type="$(node -e "const p=require(process.argv[1]); process.stdout.write(p.build_type || 'legacy')" "$RUNNER_TEMP/pages.json")"
+            if [[ "$build_type" == "workflow" ]]; then
+              echo "enabled=true" >> "$GITHUB_OUTPUT"
+              {
+                echo "### GitHub Pages configuration"
+                echo "Pages is enabled and configured to use GitHub Actions."
+              } >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "enabled=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::GitHub Pages exists but is not configured to use GitHub Actions. Open Settings → Pages → Build and deployment → Source and select GitHub Actions."
+              {
+                echo "### Deployment skipped"
+                echo "The build and tests run normally, but Pages is currently configured for branch-based deployment."
+                echo "In [Settings → Pages](https://github.com/$GITHUB_REPOSITORY/settings/pages), select **GitHub Actions** as the source, then rerun this workflow."
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          elif [[ "$status" == "404" ]]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::GitHub Pages is not enabled for this repository yet. Build and tests will run; deployment is skipped."
+            {
+              echo "### Deployment skipped — one-time setup required"
+              echo "The tests and production build still run. GitHub does not allow this workflow token to create the Pages site automatically."
+              echo "Open [Settings → Pages](https://github.com/$GITHUB_REPOSITORY/settings/pages) and choose **GitHub Actions** under **Build and deployment → Source**."
+              echo "After saving that setting, rerun this workflow. Future pushes to `main` will build and deploy automatically."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            cat "$RUNNER_TEMP/pages.json"
+            echo "::error::Unable to check GitHub Pages configuration (HTTP $status)."
+            exit 1
+          fi
+
   deploy:
     name: Deploy to GitHub Pages
-    needs: build
+    needs: [build, check-pages]
+    if: needs.check-pages.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -70,38 +112,3 @@ jobs:
       - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4
-
-  sync-source:
-    name: Commit unpacked source files
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Unpack and commit source tree on first deployment
-        shell: bash
-        run: |
-          if [[ -f package.json || ! -f .upload/source.tar.gz.b64 ]]; then
-            echo "Source tree is already present; no sync needed."
-            exit 0
-          fi
-
-          base64 --decode .upload/source.tar.gz.b64 > /tmp/ruzickajakub-source.tar.gz
-          tar -xzf /tmp/ruzickajakub-source.tar.gz --no-same-owner -C .
-          node -e "const fs=require('node:fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.devDependencies={...p.devDependencies,esbuild:'^0.28.2'}; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
-          rm -rf .upload
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-
-          if git diff --cached --quiet; then
-            echo "No source changes to commit."
-            exit 0
-          fi
-
-          git commit -m "chore: add RUZICKAJAKUB V6 source tree"
-          git push origin HEAD:main
