@@ -1264,18 +1264,18 @@ export default function App() {
       rootEl.style.setProperty('--edge-blur-boost-bottom', `${(edgeEnergyBottom * 64).toFixed(2)}px`);
       rootEl.style.setProperty('--edge-diffusion-boost-top', `${(edgeEnergyTop * 28).toFixed(2)}px`);
       rootEl.style.setProperty('--edge-diffusion-boost-bottom', `${(edgeEnergyBottom * 28).toFixed(2)}px`);
-      rootEl.style.setProperty('--edge-saturate-top', (1.08 + edgeEnergyTop * 0.10).toFixed(3));
-      rootEl.style.setProperty('--edge-saturate-bottom', (1.08 + edgeEnergyBottom * 0.10).toFixed(3));
-      rootEl.style.setProperty('--edge-haze-opacity-top', (0.56 + edgeEnergyTop * 0.18).toFixed(3));
-      rootEl.style.setProperty('--edge-haze-opacity-bottom', (0.56 + edgeEnergyBottom * 0.18).toFixed(3));
-      rootEl.style.setProperty('--edge-mist-opacity-top', (0.38 + edgeEnergyTop * 0.18).toFixed(3));
-      rootEl.style.setProperty('--edge-mist-opacity-bottom', (0.38 + edgeEnergyBottom * 0.18).toFixed(3));
-      rootEl.style.setProperty('--edge-glow-opacity-top', (0.34 + edgeEnergyTop * 0.45).toFixed(3));
-      rootEl.style.setProperty('--edge-glow-opacity-bottom', (0.34 + edgeEnergyBottom * 0.45).toFixed(3));
-      rootEl.style.setProperty('--edge-shine-opacity-top', (0.20 + edgeEnergyTop * 0.32).toFixed(3));
-      rootEl.style.setProperty('--edge-shine-opacity-bottom', (0.20 + edgeEnergyBottom * 0.32).toFixed(3));
-      rootEl.style.setProperty('--edge-diffusion-opacity-top', (0.82 + edgeEnergyTop * 0.14).toFixed(3));
-      rootEl.style.setProperty('--edge-diffusion-opacity-bottom', (0.82 + edgeEnergyBottom * 0.14).toFixed(3));
+      rootEl.style.setProperty('--edge-saturate-top', (1.04 + edgeEnergyTop * 0.10).toFixed(3));
+      rootEl.style.setProperty('--edge-saturate-bottom', (1.04 + edgeEnergyBottom * 0.10).toFixed(3));
+      rootEl.style.setProperty('--edge-haze-opacity-top', (0.46 + edgeEnergyTop * 0.18).toFixed(3));
+      rootEl.style.setProperty('--edge-haze-opacity-bottom', (0.46 + edgeEnergyBottom * 0.18).toFixed(3));
+      rootEl.style.setProperty('--edge-mist-opacity-top', (0.32 + edgeEnergyTop * 0.18).toFixed(3));
+      rootEl.style.setProperty('--edge-mist-opacity-bottom', (0.32 + edgeEnergyBottom * 0.18).toFixed(3));
+      rootEl.style.setProperty('--edge-glow-opacity-top', (0.25 + edgeEnergyTop * 0.45).toFixed(3));
+      rootEl.style.setProperty('--edge-glow-opacity-bottom', (0.25 + edgeEnergyBottom * 0.45).toFixed(3));
+      rootEl.style.setProperty('--edge-shine-opacity-top', (0.14 + edgeEnergyTop * 0.32).toFixed(3));
+      rootEl.style.setProperty('--edge-shine-opacity-bottom', (0.14 + edgeEnergyBottom * 0.32).toFixed(3));
+      rootEl.style.setProperty('--edge-diffusion-opacity-top', (0.68 + edgeEnergyTop * 0.14).toFixed(3));
+      rootEl.style.setProperty('--edge-diffusion-opacity-bottom', (0.68 + edgeEnergyBottom * 0.14).toFixed(3));
 
       // Do not transform the fixed edge wrappers: transform establishes a
       // backdrop root and prevents their ::before/::after layers from sampling
@@ -1452,8 +1452,6 @@ export default function App() {
       </div>
 
       {/* Left/right viewport diffusion keeps full-bleed gallery boundaries soft. */}
-      <div className="edge edge--left" aria-hidden="true" />
-      <div className="edge edge--right" aria-hidden="true" />
 
       {/* Right Edge Scroll Progress */}
       <div className="scroll-progress" aria-hidden="true">
