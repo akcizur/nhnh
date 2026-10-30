@@ -11,6 +11,20 @@
   --edge-blur-diffusion: 54px;
   --edge-energy-top: 0;
   --edge-energy-bottom: 0;
+  --edge-blur-boost-top: 0px;
+  --edge-blur-boost-bottom: 0px;
+  --edge-saturate-top: 1.08;
+  --edge-saturate-bottom: 1.08;
+  --edge-haze-opacity-top: .56;
+  --edge-haze-opacity-bottom: .56;
+  --edge-mist-opacity-top: .38;
+  --edge-mist-opacity-bottom: .38;
+  --edge-glow-opacity-top: .34;
+  --edge-glow-opacity-bottom: .34;
+  --edge-shine-opacity-top: .20;
+  --edge-shine-opacity-bottom: .20;
+  --edge-diffusion-opacity-top: .82;
+  --edge-diffusion-opacity-bottom: .82;
   --film-base: 0.055;
 
   /* 3D embossed lettering - Dark Mode
@@ -175,32 +189,47 @@ a {
   position: fixed;
   inset-inline: 0;
   height: var(--edge-size);
-  z-index: 96;
+  z-index: 98;
   pointer-events: none;
+  isolation: isolate;
   overflow: visible;
 }
 
 .edge--top {
   top: 0;
   --edge-energy: var(--edge-energy-top);
+  --edge-blur-boost: var(--edge-blur-boost-top, 0px);
+  --edge-saturate: var(--edge-saturate-top, 1.08);
+  --edge-haze-opacity: var(--edge-haze-opacity-top, .56);
+  --edge-mist-opacity: var(--edge-mist-opacity-top, .38);
+  --edge-glow-opacity: var(--edge-glow-opacity-top, .34);
+  --edge-shine-opacity: var(--edge-shine-opacity-top, .20);
+  --edge-diffusion-opacity: var(--edge-diffusion-opacity-top, .82);
 }
 
 .edge--bottom {
   bottom: 0;
   --edge-energy: var(--edge-energy-bottom);
+  --edge-blur-boost: var(--edge-blur-boost-bottom, 0px);
+  --edge-saturate: var(--edge-saturate-bottom, 1.08);
+  --edge-haze-opacity: var(--edge-haze-opacity-bottom, .56);
+  --edge-mist-opacity: var(--edge-mist-opacity-bottom, .38);
+  --edge-glow-opacity: var(--edge-glow-opacity-bottom, .34);
+  --edge-shine-opacity: var(--edge-shine-opacity-bottom, .20);
+  --edge-diffusion-opacity: var(--edge-diffusion-opacity-bottom, .82);
 }
 
 .edge::before {
   content: "";
   position: absolute;
   inset: -36px -4% -36px;
-  background: rgba(5,5,5,.018);
+  background: linear-gradient(180deg, rgba(255,255,255,.085) 0%, rgba(255,255,255,.035) 36%, rgba(255,255,255,.008) 68%, transparent 100%);
   backdrop-filter:
-    blur(calc(var(--edge-blur-main) + var(--edge-energy) * 64px))
-    saturate(calc(1.04 + var(--edge-energy) * .10));
+    blur(calc(var(--edge-blur-main) + var(--edge-blur-boost, 0px)))
+    saturate(var(--edge-saturate, 1.08));
   -webkit-backdrop-filter:
-    blur(calc(var(--edge-blur-main) + var(--edge-energy) * 64px))
-    saturate(calc(1.04 + var(--edge-energy) * .10));
+    blur(calc(var(--edge-blur-main) + var(--edge-blur-boost, 0px)))
+    saturate(var(--edge-saturate, 1.08));
   -webkit-mask-image: linear-gradient(
     180deg,
     #000 0%, #000 4%, rgba(0,0,0,.985) 13%, rgba(0,0,0,.95) 27%,
@@ -216,7 +245,7 @@ a {
 }
 
 html.light .edge::before {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(10,20,30,.075) 0%, rgba(10,20,30,.028) 36%, rgba(10,20,30,.008) 68%, transparent 100%);
 }
 
 .edge--bottom::before {
@@ -229,19 +258,19 @@ html.light .edge::before {
   position: absolute;
   inset: -22px -3% -22px;
   background:
-    linear-gradient(90deg, rgba(255,255,255,.028), transparent 10%, transparent 90%, rgba(255,255,255,.028)),
-    linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.22) 24%, rgba(0,0,0,.10) 52%, transparent 82%);
-  backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-energy) * 28px));
-  -webkit-backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-energy) * 28px));
+    linear-gradient(90deg, rgba(255,255,255,.055), transparent 12%, transparent 88%, rgba(255,255,255,.055)),
+    linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.13) 28%, rgba(0,0,0,.045) 55%, transparent 84%);
+  backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-blur-boost, 0px) * .45)) saturate(var(--edge-saturate, 1.08));
+  -webkit-backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-blur-boost, 0px) * .45)) saturate(var(--edge-saturate, 1.08));
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 8%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.54) 58%, rgba(0,0,0,.18) 84%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 0%, #000 8%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.54) 58%, rgba(0,0,0,.18) 84%, transparent 100%);
-  opacity: calc(.68 + var(--edge-energy) * .14);
+  opacity: var(--edge-diffusion-opacity, .82);
 }
 
 html.light .edge::after {
   background:
-    linear-gradient(90deg, rgba(0,0,0,.015), transparent 10%, transparent 90%, rgba(0,0,0,.015)),
-    linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.2) 24%, transparent 82%);
+    linear-gradient(90deg, rgba(0,0,0,.035), transparent 12%, transparent 88%, rgba(0,0,0,.035)),
+    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.14) 28%, transparent 84%);
 }
 
 .edge--bottom::after {
@@ -254,8 +283,8 @@ html.light .edge::after {
 
 html.light .edge--bottom::after {
   background:
-    linear-gradient(90deg, rgba(0,0,0,.015), transparent 10%, transparent 90%, rgba(0,0,0,.015)),
-    linear-gradient(0deg, rgba(255,255,255,.5), rgba(255,255,255,.2) 24%, transparent 82%);
+    linear-gradient(90deg, rgba(0,0,0,.035), transparent 12%, transparent 88%, rgba(0,0,0,.035)),
+    linear-gradient(0deg, rgba(255,255,255,.36), rgba(255,255,255,.14) 28%, transparent 84%);
 }
 
 .edge__haze, .edge__mist, .edge__glow, .edge__shine {
@@ -266,7 +295,7 @@ html.light .edge--bottom::after {
   inset: -8% -2%;
   background: linear-gradient(180deg, rgba(255,255,255,.034), rgba(255,255,255,.012) 34%, transparent 82%);
   filter: blur(48px);
-  opacity: calc(.46 + var(--edge-energy) * .18);
+  opacity: var(--edge-haze-opacity, .56);
 }
 
 .edge--bottom .edge__haze {
@@ -279,7 +308,7 @@ html.light .edge--bottom::after {
     radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.052) 0%, rgba(255,255,255,.018) 30%, transparent 68%),
     linear-gradient(180deg, rgba(255,255,255,.014), transparent 64%);
   filter: blur(34px);
-  opacity: calc(.32 + var(--edge-energy) * .18);
+  opacity: var(--edge-mist-opacity, .38);
   transform: translate3d(0, var(--mist-drift, 0px), 0);
 }
 
@@ -292,7 +321,7 @@ html.light .edge--bottom::after {
 .edge__glow {
   width: min(54vw, 760px); height: min(32vw, 460px); border-radius: 999px;
   background: radial-gradient(circle at center, rgba(255,255,255,.12) 0%, rgba(255,255,255,.045) 34%, rgba(255,255,255,0) 72%);
-  filter: blur(84px); opacity: calc(.25 + var(--edge-energy) * .45);
+  filter: blur(84px); opacity: var(--edge-glow-opacity, .34);
 }
 
 html.light .edge__glow {
@@ -305,11 +334,69 @@ html.light .edge__glow {
 .edge__shine {
   left: 8%; right: 8%; height: 1px; border-radius: 999px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.13), transparent);
-  filter: blur(1.1px); opacity: calc(.14 + var(--edge-energy) * .32);
+  filter: blur(1.1px); opacity: var(--edge-shine-opacity, .20);
 }
 
 .edge--top .edge__shine { bottom: 17%; }
 .edge--bottom .edge__shine { top: 17%; }
+
+/* Side glass edges complement the top/bottom refraction. These use plain
+   length/number variables instead of typed multiplication inside calc(), so
+   backdrop blur remains active in Firefox as well as Chromium/WebKit. */
+.edge--left,
+.edge--right {
+  top: 0;
+  bottom: 0;
+  width: clamp(88px, 12vw, 190px);
+  height: auto;
+  --edge-energy: 0;
+}
+.edge--left { left: 0; right: auto; }
+.edge--right { left: auto; right: 0; }
+
+.edge--left::before,
+.edge--right::before {
+  inset: -3% -34px;
+  background: linear-gradient(90deg, rgba(255,255,255,.085) 0%, rgba(255,255,255,.035) 38%, rgba(255,255,255,.008) 70%, transparent 100%);
+  backdrop-filter: blur(44px) saturate(1.08);
+  -webkit-backdrop-filter: blur(44px) saturate(1.08);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.48) 62%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.48) 62%, transparent 100%);
+}
+.edge--right::before {
+  background: linear-gradient(270deg, rgba(255,255,255,.085) 0%, rgba(255,255,255,.035) 38%, rgba(255,255,255,.008) 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.48) 62%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.48) 62%, transparent 100%);
+}
+html.light .edge--left::before,
+html.light .edge--right::before {
+  background: linear-gradient(90deg, rgba(10,20,30,.075) 0%, rgba(10,20,30,.028) 38%, rgba(10,20,30,.006) 70%, transparent 100%);
+}
+html.light .edge--right::before {
+  background: linear-gradient(270deg, rgba(10,20,30,.075) 0%, rgba(10,20,30,.028) 38%, rgba(10,20,30,.006) 70%, transparent 100%);
+}
+.edge--left::after,
+.edge--right::after {
+  inset: -2% -20px;
+  background: linear-gradient(90deg, rgba(0,0,0,.12), rgba(0,0,0,.035) 36%, transparent 88%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.7) 34%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.7) 34%, transparent 100%);
+  opacity: .72;
+}
+.edge--right::after {
+  background: linear-gradient(270deg, rgba(0,0,0,.12), rgba(0,0,0,.035) 36%, transparent 88%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.7) 34%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.7) 34%, transparent 100%);
+}
+html.light .edge--left::after,
+html.light .edge--right::after {
+  background: linear-gradient(90deg, rgba(255,255,255,.32), rgba(255,255,255,.11) 36%, transparent 88%);
+}
+html.light .edge--right::after {
+  background: linear-gradient(270deg, rgba(255,255,255,.32), rgba(255,255,255,.11) 36%, transparent 88%);
+}
 
 .nav {
   position: fixed; inset: 0 0 auto 0; height: var(--nav-height); z-index: 100;
