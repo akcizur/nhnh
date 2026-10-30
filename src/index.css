@@ -13,6 +13,8 @@
   --edge-energy-bottom: 0;
   --edge-blur-boost-top: 0px;
   --edge-blur-boost-bottom: 0px;
+  --edge-diffusion-boost-top: 0px;
+  --edge-diffusion-boost-bottom: 0px;
   --edge-saturate-top: 1.08;
   --edge-saturate-bottom: 1.08;
   --edge-haze-opacity-top: .56;
@@ -199,6 +201,7 @@ a {
   top: 0;
   --edge-energy: var(--edge-energy-top);
   --edge-blur-boost: var(--edge-blur-boost-top, 0px);
+  --edge-diffusion-boost: var(--edge-diffusion-boost-top, 0px);
   --edge-saturate: var(--edge-saturate-top, 1.08);
   --edge-haze-opacity: var(--edge-haze-opacity-top, .56);
   --edge-mist-opacity: var(--edge-mist-opacity-top, .38);
@@ -211,6 +214,7 @@ a {
   bottom: 0;
   --edge-energy: var(--edge-energy-bottom);
   --edge-blur-boost: var(--edge-blur-boost-bottom, 0px);
+  --edge-diffusion-boost: var(--edge-diffusion-boost-bottom, 0px);
   --edge-saturate: var(--edge-saturate-bottom, 1.08);
   --edge-haze-opacity: var(--edge-haze-opacity-bottom, .56);
   --edge-mist-opacity: var(--edge-mist-opacity-bottom, .38);
@@ -260,8 +264,8 @@ html.light .edge::before {
   background:
     linear-gradient(90deg, rgba(255,255,255,.055), transparent 12%, transparent 88%, rgba(255,255,255,.055)),
     linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.13) 28%, rgba(0,0,0,.045) 55%, transparent 84%);
-  backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-blur-boost, 0px) * .45)) saturate(var(--edge-saturate, 1.08));
-  -webkit-backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-blur-boost, 0px) * .45)) saturate(var(--edge-saturate, 1.08));
+  backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-diffusion-boost, 0px))) saturate(var(--edge-saturate, 1.08));
+  -webkit-backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-diffusion-boost, 0px))) saturate(var(--edge-saturate, 1.08));
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 8%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.54) 58%, rgba(0,0,0,.18) 84%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 0%, #000 8%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.54) 58%, rgba(0,0,0,.18) 84%, transparent 100%);
   opacity: var(--edge-diffusion-opacity, .82);
