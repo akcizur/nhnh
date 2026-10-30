@@ -169,11 +169,13 @@ a {
   color: inherit;
 }
 
+/* Keep the glass edge overlays above pinned project sections (z-index: 91),
+   but beneath the fixed navigation (z-index: 100) and interactive UI. */
 .edge {
   position: fixed;
   inset-inline: 0;
   height: var(--edge-size);
-  z-index: 90;
+  z-index: 96;
   pointer-events: none;
   overflow: visible;
 }
